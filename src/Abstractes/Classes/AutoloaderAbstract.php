@@ -65,11 +65,10 @@ abstract class AutoloaderAbstract implements AutoloaderInterface
      * Autoloader constructor.
      * @param mixed $path
      */
-  protected function __construct($path=null)
+  protected function __construct($path)
   {
     $this->register();
-
-    if(null !== $path)$this->iniLoad($path);
+    $this->iniLoad($path);
     return $this;
   }
 
@@ -282,6 +281,7 @@ abstract class AutoloaderAbstract implements AutoloaderInterface
                 else if (($f !== false) && (null !== $f) && (substr(strtolower($f), -4) == '.php') && stripos($f,'abstract') !== false) $this->abstract_classes[] = $f;
                 else if(($f !== false) && (null !== $f) && (substr(strtolower($f), -4) == '.php') && (stripos($f,'class') !== false OR stripos($f,'Class.php') !== false)) $this->classes[]=$f;
                 else if (($f !== false) && (null !== $f) && (substr(strtolower($f), -4) == '.php') && stripos($f,'abstract') === false) $this->other_classes[] = $f;
+                else if (($f !== false) && (null !== $f) && (substr(strtolower($f), -4) == '.php')) $this->other_classes[] = $f;
 
             }
         }
@@ -329,6 +329,50 @@ abstract class AutoloaderAbstract implements AutoloaderInterface
         return $this;
     }
 
+    public function getClassName($file)
+    {
+        $classMatch        = [];
+        $namespaceMatch    = [];
+        $classFileContents = file_get_contents($file);
+        $class = '';
+
+        preg_match('/^(abstract|final|interface|trait|class)(.*)$/m', $classFileContents, $classMatch);
+        preg_match('/^namespace(.*)$/m', $classFileContents, $namespaceMatch);
+
+        if (isset($classMatch[0])) {
+            if (strpos($classMatch[0], 'abstract') !== false) {
+                $class = str_replace('abstract class ', '', $classMatch[0]);
+            } else if (strpos($classMatch[0], 'interface') !== false) {
+                $class = str_replace('interface ', '', $classMatch[0]);
+            } else if (strpos($classMatch[0], 'trait') !== false) {
+                $class = str_replace('trait ', '', $classMatch[0]);
+            } else if ($classMatch[1] === 'final') {
+                $class = str_replace('final class', '', $classMatch[0]);
+            }else {
+                $class = str_replace('class', '', $classMatch[0]);
+            }
+
+            if (strpos($class, ' ') !== false) {
+                $class = substr($class, strpos($class, ' ') );
+            }
+
+            $class = trim($class);
+            if (isset($namespaceMatch[0])) {
+                $class = trim(str_replace(';', '', str_replace('namespace ', '', $namespaceMatch[0]))) . '\\' . $class;
+                }
+
+            }else {
+                if (strripos($file, '/') > 0 and strripos($file, '.php') > 0){
+                    $class = substr($file, strripos($file, '/') +1, strripos($file, '.php') - strripos($file, '/') - 1);
+            }elseif (strripos($file, '\\') > 0 and strripos($file, '.php') > 0){
+                    $class = substr($file, strripos($file, '\\')+1 , strripos($file, '.php') - strripos($file, '\\') - 1);
+                }
+
+            }
+
+        return $class;
+    }
+
     /**
      * @param $file
      * @return $this
@@ -337,9 +381,11 @@ abstract class AutoloaderAbstract implements AutoloaderInterface
     {
         if(file_exists($file))
         {
-            // $file возвращает ассоциативный массив
-            $classMap = require_once $file;
-            return $this->addClassMap($classMap);
+                // $file возвращает ассоциативный массив
+                $classMap = require_once $file;
+                return $this->addClassMap($classMap);
+
+
         }
         return $this;
     }
@@ -380,45 +426,8 @@ abstract class AutoloaderAbstract implements AutoloaderInterface
 
         foreach ($this->files as $file) {
 
-            $classMatch        = [];
-            $namespaceMatch    = [];
-            $classFileContents = file_get_contents($file);
-
-            preg_match('/^(abstract|final|interface|trait|class)(.*)$/m', $classFileContents, $classMatch);
-            preg_match('/^namespace(.*)$/m', $classFileContents, $namespaceMatch);
-
-            if (isset($classMatch[0])) {
-                if (strpos($classMatch[0], 'abstract') !== false) {
-                    $class = str_replace('abstract class ', '', $classMatch[0]);
-                } else if (strpos($classMatch[0], 'interface') !== false) {
-                    $class = str_replace('interface ', '', $classMatch[0]);
-                } else if (strpos($classMatch[0], 'trait') !== false) {
-                    $class = str_replace('trait ', '', $classMatch[0]);
-                } else if ($classMatch[1] === 'final') {
-                    $class = str_replace('final class', '', $classMatch[2]);
-                }else {
-                    $class = str_replace('class ', '', $classMatch[0]);
-                }
-
-                if (strpos($class, ' ') !== false) {
-                    $class = substr($class, 0, strpos($class, ' '));
-                }
-
-                $class = trim($class);
-                if (isset($namespaceMatch[0])) {
-                    $class = trim(str_replace(';', '', str_replace('namespace ', '', $namespaceMatch[0]))) . '\\' . $class;
-                }
-
-                $this->classMap[$class] = str_replace('\\', '/', $file);
-            }else {
-                if (strripos($file, '/') > 0 and strripos($file, '.php') > 0){
-                    $class = substr($file, strripos($file, '/') +1, strripos($file, '.php') - strripos($file, '/') - 1);
-            }else  if (strripos($file, '\\') > 0 and strripos($file, '.php') > 0){
-                    $class = substr($file, strripos($file, '\\')+1 , strripos($file, '.php') - strripos($file, '\\') - 1);
-                }
-
-                $this->classMap[$class] = str_replace('\\', '/', $file);
-            }
+            $class = $this->getClassName($file);
+            $this->classMap[$class] = str_replace('\\', '/', $file);
         }
 
         return $this;
@@ -431,7 +440,7 @@ abstract class AutoloaderAbstract implements AutoloaderInterface
         return  false;
     }
 
-    public function loadClass($class)
+    public function loadClass($class): bool
     {
         $classFile = $this->findClass($class);
         if($classFile !== false)

@@ -150,6 +150,8 @@ interface AutoloaderInterface
      */
     public function loadAllFiles();
 
+    public function getClassName($file);
+
     /**
      * @param $path
      * @return mixed
