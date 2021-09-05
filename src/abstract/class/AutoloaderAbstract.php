@@ -2,7 +2,7 @@
 
 namespace Hydra\Autoloader;
 
-require_once(dirname(__DIR__).'/interface/AutoloaderInterface.php');
+require_once(dirname(__DIR__) . '/interface/AutoloaderInterface.php');
 
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;

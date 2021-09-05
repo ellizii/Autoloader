@@ -3,7 +3,7 @@
 
 namespace Hydra\Autoloader;
 
-require_once ('abstract/class/AutoloaderAbstract.php');
+require_once('abstract/class/AutoloaderAbstract.php');
 class Autoloader extends AutoloaderAbstract
 {
 

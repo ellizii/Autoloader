@@ -2,7 +2,7 @@
 
 use Hydra\Autoloader\Autoloader;
 
-include_once dirname(__DIR__).'/src/Autoloader.php';
+include_once dirname(__DIR__) . '/src/Autoloader.php';
 
 $path = dirname(dirname(__DIR__)).'/orm/connector';
 
