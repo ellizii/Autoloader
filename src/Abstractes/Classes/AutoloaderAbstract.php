@@ -1,9 +1,10 @@
 <?php
 
-namespace Ellizii\Autoloader;
+namespace Ellizii\Autoloader\Abstractes\Classes;
 
-require_once(dirname(__DIR__) . '/interface/AutoloaderInterface.php');
+require_once(dirname(__DIR__) . '/Interfaces/AutoloaderInterface.php');
 
+use Ellizii\Autoloader\Abstractes\Interfaces\AutoloaderInterface;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 
@@ -66,7 +67,6 @@ abstract class AutoloaderAbstract implements AutoloaderInterface
      */
   protected function __construct($path=null)
   {
-
     $this->register();
 
     if(null !== $path)$this->iniLoad($path);
@@ -203,7 +203,7 @@ abstract class AutoloaderAbstract implements AutoloaderInterface
      */
     public function addDirectoryList($list): AutoloaderInterface
     {
-        $source=[];
+
         if(!is_array($list))$source = [$list];
         else $source = $list;
 
@@ -241,7 +241,7 @@ abstract class AutoloaderAbstract implements AutoloaderInterface
      */
     public function addFileList($list): AutoloaderInterface
     {
-        $source=[];
+
         if(!is_array($list))$source = [$list];
         else $source = $list;
 
@@ -452,4 +452,8 @@ abstract class AutoloaderAbstract implements AutoloaderInterface
             $this->loadClass($inc);
         }
     }
+
+    abstract public function __clone();
+
+    abstract public function __wakeup();
 }

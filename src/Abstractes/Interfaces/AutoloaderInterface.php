@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Ellizii\Autoloader;
+namespace Ellizii\Autoloader\Abstractes\Interfaces;
 
 
 interface AutoloaderInterface
@@ -155,4 +155,8 @@ interface AutoloaderInterface
      * @return mixed
      */
     public function iniLoad($path);
+
+    public function __clone();
+
+    public function __wakeup();
 }
