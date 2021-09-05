@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Hydra\Autoloader;
+namespace Ellizii\Autoloader;
 
 
 interface AutoloaderInterface

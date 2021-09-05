@@ -1,6 +1,6 @@
 <?php
 
-namespace Hydra\Autoloader;
+namespace Ellizii\Autoloader;
 
 require_once(dirname(__DIR__) . '/interface/AutoloaderInterface.php');
 
@@ -64,12 +64,12 @@ abstract class AutoloaderAbstract implements AutoloaderInterface
      * Autoloader constructor.
      * @param mixed $path
      */
-  protected function __construct($path)
+  protected function __construct($path=null)
   {
 
     $this->register();
 
-    $this->iniLoad($path);
+    if(null !== $path)$this->iniLoad($path);
     return $this;
   }
 

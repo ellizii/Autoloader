@@ -1,7 +1,7 @@
 {
-  "name": "hydra/autoloader",
+  "name": "ellizii/autoloader",
   "type": "package",
-  "description": "description",
+  "description": "Autoloader",
   "minimum-stability": "stable",
   "license": "proprietary",
   "authors": [
@@ -15,7 +15,7 @@
   },
   "autoload": {
     "psr-4": {
-      "Hydra\\Autoloader\\": "src/"
+      "Ellizii\\Autoloader\\": "src/"
     }
   }
 }
