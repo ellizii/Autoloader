@@ -150,5 +150,9 @@ interface AutoloaderInterface
      */
     public function loadAllFiles();
 
+    /**
+     * @param $path
+     * @return mixed
+     */
     public function iniLoad($path);
 }

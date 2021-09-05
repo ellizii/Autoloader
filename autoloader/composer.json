@@ -1,0 +1,21 @@
+{
+  "name": "hydra/autoloader",
+  "type": "package",
+  "description": "description",
+  "minimum-stability": "stable",
+  "license": "proprietary",
+  "authors": [
+    {
+      "name": "ellizii.ru",
+      "email": "ellizii@yandex.ru"
+    }
+  ],
+  "require": {
+    "php": ">=7.4.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "Hydra\\Autoloader\\": "src/"
+    }
+  }
+}
