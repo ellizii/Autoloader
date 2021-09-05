@@ -5,7 +5,7 @@ use Ellizii\Autoloader\Autoloader;
 include_once dirname(__DIR__) . '/src/Autoloader.php';
 /*===============================================*/
 /* folder */
-$path =array(__DIR__.'/load');
+//$path =array(__DIR__.'/load');
 
 /* files array */
 //$path =array(__DIR__.'/load/Load.php',__DIR__.'/load/LoadTrait.php');
@@ -13,7 +13,7 @@ $path =array(__DIR__.'/load');
 /* file */
 //$path = __DIR__.'/load/LoadInterface.php';
 
-//$path = __DIR__.'/load/loadArray.php';
+$path = __DIR__.'/load/loadArray.php';
 
 $loader =  Autoloader::instance($path);
 

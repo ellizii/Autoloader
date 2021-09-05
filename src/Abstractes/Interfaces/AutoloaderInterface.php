@@ -152,6 +152,8 @@ interface AutoloaderInterface
 
     public function getClassName($file);
 
+    public function attachToArray($file);
+
     /**
      * @param $path
      * @return mixed

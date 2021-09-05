@@ -255,37 +255,51 @@ abstract class AutoloaderAbstract implements AutoloaderInterface
         return $this;
     }
 
+    public function attachToArray($f)
+    {
+        if(($f !== false) && (null !== $f) && (substr(strtolower($f), -4) == '.php') && ( stripos($f,'ObjectFunction.php') !== false)) $this->object_functions[]=$f;
+        else if(($f !== false) && (null !== $f) && (substr(strtolower($f), -4) == '.php') && (stripos($f,'_function') !== false OR stripos($f,'functions') !== false OR stripos($f,'Function.php') !== false)) $this->functions[]=$f;
+        else if(($f !== false) && (null !== $f) && (substr(strtolower($f), -4) == '.php') && (stripos($f,'abstract/interface') !== false OR stripos($f,'Interface.php') !== false)) $this->interfaces[]=$f;
+        else if(($f !== false) && (null !== $f) && (substr(strtolower($f), -4) == '.php') && (stripos($f,'abstract/iterator') !== false OR stripos($f,'Iterator.php') !== false)) $this->iterators[]=$f;
+        else if(($f !== false) && (null !== $f) && (substr(strtolower($f), -4) == '.php') && (stripos($f,'abstract/trait') !== false OR stripos($f,'Trait.php') !== false)) $this->traits[]=$f;
+        else if(($f !== false) && (null !== $f) && (substr(strtolower($f), -4) == '.php') && (stripos($f,'abstract/class') !== false OR stripos($f,'Abstract.php') !== false)) $this->abstract_classes[]=$f;
+        else if (($f !== false) && (null !== $f) && (substr(strtolower($f), -4) == '.php') && stripos($f,'abstract') !== false) $this->abstract_classes[] = $f;
+        else if(($f !== false) && (null !== $f) && (substr(strtolower($f), -4) == '.php') && (stripos($f,'class') !== false OR stripos($f,'Class.php') !== false)) $this->classes[]=$f;
+        else if (($f !== false) && (null !== $f) && (substr(strtolower($f), -4) == '.php') && stripos($f,'abstract') === false) $this->other_classes[] = $f;
+        else if (($f !== false) && (null !== $f) && (substr(strtolower($f), -4) == '.php')) $this->other_classes[] = $f;
+
+    }
+
     /**
      *
      */
     public function scanPath()
     {
         foreach ($this->classMapFrom as $source) {
-        $objects = new RecursiveIteratorIterator(
-            new RecursiveDirectoryIterator($source), RecursiveIteratorIterator::SELF_FIRST
-        );
 
-        foreach ($objects as $fileInfo) {
-            if (($fileInfo->getFilename() != '.') && ($fileInfo->getFilename() != '..')) {
-                $f = null;
-                if (!$fileInfo->isDir()) {
-                    $f = realpath($fileInfo->getPathname());
+            $objects = null;
+        if(is_dir($source)) {
+
+            $objects = new RecursiveIteratorIterator(
+                new RecursiveDirectoryIterator($source), RecursiveIteratorIterator::SELF_FIRST
+            );
+
+            foreach ($objects as $fileInfo) {
+                if (($fileInfo->getFilename() != '.') && ($fileInfo->getFilename() != '..')) {
+                    $f = null;
+                    if (!$fileInfo->isDir()) {
+                        $f = realpath($fileInfo->getPathname());
+                    }
+
+                    $this->attachToArray($f);
                 }
-
-                if(($f !== false) && (null !== $f) && (substr(strtolower($f), -4) == '.php') && ( stripos($f,'ObjectFunction.php') !== false)) $this->object_functions[]=$f;
-                else if(($f !== false) && (null !== $f) && (substr(strtolower($f), -4) == '.php') && (stripos($f,'_function') !== false OR stripos($f,'functions') !== false OR stripos($f,'Function.php') !== false)) $this->functions[]=$f;
-                else if(($f !== false) && (null !== $f) && (substr(strtolower($f), -4) == '.php') && (stripos($f,'abstract/interface') !== false OR stripos($f,'Interface.php') !== false)) $this->interfaces[]=$f;
-                else if(($f !== false) && (null !== $f) && (substr(strtolower($f), -4) == '.php') && (stripos($f,'abstract/iterator') !== false OR stripos($f,'Iterator.php') !== false)) $this->iterators[]=$f;
-                else if(($f !== false) && (null !== $f) && (substr(strtolower($f), -4) == '.php') && (stripos($f,'abstract/trait') !== false OR stripos($f,'Trait.php') !== false)) $this->traits[]=$f;
-                else if(($f !== false) && (null !== $f) && (substr(strtolower($f), -4) == '.php') && (stripos($f,'abstract/class') !== false OR stripos($f,'Abstract.php') !== false)) $this->abstract_classes[]=$f;
-                else if (($f !== false) && (null !== $f) && (substr(strtolower($f), -4) == '.php') && stripos($f,'abstract') !== false) $this->abstract_classes[] = $f;
-                else if(($f !== false) && (null !== $f) && (substr(strtolower($f), -4) == '.php') && (stripos($f,'class') !== false OR stripos($f,'Class.php') !== false)) $this->classes[]=$f;
-                else if (($f !== false) && (null !== $f) && (substr(strtolower($f), -4) == '.php') && stripos($f,'abstract') === false) $this->other_classes[] = $f;
-                else if (($f !== false) && (null !== $f) && (substr(strtolower($f), -4) == '.php')) $this->other_classes[] = $f;
-
             }
-        }
+        }elseif(is_file($source)){
 
+            $f = realpath($source);
+
+            $this->attachToArray($f);
+        }
 
     }
 
@@ -391,12 +405,16 @@ abstract class AutoloaderAbstract implements AutoloaderInterface
 
             if(isset($classMatch[0]))
             {
-                $classMap[$this->getClassName($file)] = $file;
+                $this->classMapFrom[] = $file;
             }else{
                 // $file возвращает ассоциативный массив
                 $classMap = require_once $file;
+
+                $this->classMapFrom = array_merge($this->classMapFrom,$classMap);
+
             }
-            return $this->addClassMap($classMap);
+            return $this;
+
         }
         return $this;
     }
