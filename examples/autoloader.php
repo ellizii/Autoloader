@@ -3,20 +3,20 @@
 use Ellizii\Autoloader\Autoloader;
 
 include_once dirname(__DIR__) . '/src/Autoloader.php';
-
-/* Path to file, or directory
-   Or array paths to files or directories
-*/
-$path = dirname(__DIR__).'/orm/connector';
-
-$loader =  Autoloader::getInstance($path);
-
 /*===============================================*/
+/* folder */
+$path =array(__DIR__.'/load');
 
-$path =array( dirname(__DIR__).'/orm',dirname(__DIR__).'/test');
+/* files array */
+//$path =array(__DIR__.'/load/Load.php',__DIR__.'/load/LoadTrait.php');
 
-$loader =  Autoloader::getInstance();
+/* file */
+//$path = __DIR__.'/load/LoadInterface.php';
 
-$loader->iniLoad($path);
+//$path = __DIR__.'/load/loadArray.php';
+
+$loader =  Autoloader::instance($path);
+
+var_dump($loader->getClassMap());
 
 

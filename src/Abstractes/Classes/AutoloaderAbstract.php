@@ -381,11 +381,22 @@ abstract class AutoloaderAbstract implements AutoloaderInterface
     {
         if(file_exists($file))
         {
+
+            $classMatch        = [];
+            $namespaceMatch    = [];
+            $fileContents = file_get_contents($file);
+
+            preg_match('/^(abstract|final|interface|trait|class|function)(.*)$/m', $fileContents, $classMatch);
+            preg_match('/^namespace(.*)$/m', $fileContents, $namespaceMatch);
+
+            if(isset($classMatch[0]))
+            {
+                $classMap[$this->getClassName($file)] = $file;
+            }else{
                 // $file возвращает ассоциативный массив
                 $classMap = require_once $file;
-                return $this->addClassMap($classMap);
-
-
+            }
+            return $this->addClassMap($classMap);
         }
         return $this;
     }
